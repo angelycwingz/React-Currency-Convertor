@@ -3,10 +3,10 @@ import { InputBox } from './components'
 import useCurrencyInfo from './hooks/useCurrencyInfo'
 
 function App() {
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState("")
   const [from, setFrom] = useState("usd")
   const [to, setTo] = useState("inr")
-  const [convertedAmount, setConvertedAmount] = useState(0)
+  const [convertedAmount, setConvertedAmount] = useState("")
 
   const currencyInfo = useCurrencyInfo(from)
 
@@ -20,7 +20,11 @@ function App() {
   }
 
   const convert = () => {
-    setConvertedAmount(amount * currencyInfo[to])
+    if (amount === "" || isNaN(amount)) {
+      setConvertedAmount("") // clear if no input
+    } else {
+      setConvertedAmount((Number(amount) * currencyInfo[to]).toFixed(2))
+    }
   }
 
   return (
@@ -47,7 +51,12 @@ function App() {
                             currencyOptions={options}
                             onCurrencyChange={(currency) => setFrom(currency)}
                             selectCurrency={from}
-                            onAmountChange={(amount) => setAmount(amount)}
+                            onAmountChange={(val) => {
+                                setAmount(val);
+                                if (val === "") {
+                                    setConvertedAmount(""); // clear "To" if "From" cleared
+                                }
+                            }}
 
                         />
                     </div>
@@ -63,7 +72,7 @@ function App() {
                     <div className="w-full mt-1 mb-4">
                         <InputBox
                             label="To"
-                            amount={convertedAmount.toFixed(2)}
+                            amount={convertedAmount}
                             currencyOptions={options}
                             onCurrencyChange={(currency) => setTo(currency)}
                             selectCurrency={to}
